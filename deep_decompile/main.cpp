@@ -28,7 +28,7 @@ void get_called_functions(func_t* target_func, std::unordered_set<func_t*>& call
             {
                 func_t* toref = get_func(xb.to);
                 if (toref && toref != target_func)
-                    called_funcs.insert(get_func(xb.to));
+                    called_funcs.insert(toref);
             }
         }
     }
