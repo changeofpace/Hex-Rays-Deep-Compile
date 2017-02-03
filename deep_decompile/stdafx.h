@@ -4,12 +4,9 @@
 #include <windows.h>
 
 #include <stdio.h>
+#include <unordered_set>
 
-#include <set>
-
-//
-// ida
-//
+// ida 
 #define NO_OBSOLETE_FUNCS
 
 #include <ida.hpp>

@@ -1,33 +1,34 @@
 #include "stdafx.h"
+#include <Windows.h>
 
-static const char* plugin_name = "Deep Decompile";
-static const char* plugin_comment = "Fixes incorrect Hex-Rays output for function calls through batch decompilation.";
-static const char* plugin_help_text = "This plugin acts as an alternative hotkey for decompiling the function the \
-                                      cursor is currently in.  Invoking Hex-Rays through this hotkey will first \
-                                      identify all call instructions in the target function, decompile their \
-                                      respective function bodies, then use this information to more accurately \
-                                      decompile the target function.";
+hexdsp_t* hexdsp = NULL;
 
-hexdsp_t *hexdsp = NULL;
-static bool inited = false;
+namespace {
+////////////////////////////////////////////////////////////////////////////////
+// plugin description
 
-// fill 'out' with func_t objects of all called subroutines
-void filter_called_functions(func_t* func, std::set<func_t*>& out)
+const char* plugin_name = "Deep Decompile";
+const char* plugin_comment = "Improves Hex-Rays output through batch decompilation.";
+const char* plugin_help_text = "This plugin improves Hex-Rays output for a target function by decompiling all functions called by the target function before decompiling the target function.";
+
+bool plugin_initialized = false;
+
+////////////////////////////////////////////////////////////////////////////////
+// implementation
+
+void get_called_functions(func_t* target_func, std::unordered_set<func_t*>& called_funcs)
 {
-    // instruction iteration
     func_item_iterator_t fii;
-    for (bool fi_ok = fii.set(func); fi_ok; fi_ok = fii.next_code())
+    for (bool fi_ok = fii.set(target_func); fi_ok; fi_ok = fii.next_code())
     {
-        // xrefs to current instruction iteration
         xrefblk_t xb;
-        for (bool ok = xb.first_from(fii.current(), fl_CN); ok; ok = xb.next_from())
+        for (bool ok = xb.first_from(fii.current(), XREF_ALL); ok; ok = xb.next_from())
         {
-            // api bug? have to check xref type or we get jumps with fl_CN flag
-            if (xb.iscode && xb.type == fl_CN)
+            if (xb.iscode && (xb.type == fl_CN || xb.type == fl_CF))
             {
                 func_t* toref = get_func(xb.to);
-                if (toref)
-                    out.insert(get_func(xb.to));
+                if (toref && toref != target_func)
+                    called_funcs.insert(get_func(xb.to));
             }
         }
     }
@@ -35,38 +36,44 @@ void filter_called_functions(func_t* func, std::set<func_t*>& out)
 
 void deep_decompile(func_t* target_func)
 {
-    std::set<func_t*> called_funcs;
-    filter_called_functions(target_func, called_funcs);
-    for (func_t* cf : called_funcs)
+    if (!target_func)
+        return;
+    std::unordered_set<func_t*> called_funcs;
+    get_called_functions(target_func, called_funcs);
+    for (auto func : called_funcs)
     {
-        if (!has_cached_cfunc(cf->startEA))
+        if (!has_cached_cfunc(func->startEA))
         {
             hexrays_failure_t hf;
-            decompile(cf, &hf);
+            decompile(func, &hf);
         }
     }
-
     open_pseudocode(target_func->startEA, 1);
 }
+
+} // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+// plugin exports
 
 int idaapi init()
 {
     if (!init_hexrays_plugin())
-        return PLUGIN_SKIP; // no decompiler
+        return PLUGIN_SKIP;
+    plugin_initialized = true;
+    msg("Deep Decompile loaded.\n");
     return PLUGIN_OK;
 }
 
 void idaapi term()
 {
-    if (inited)
+    if (plugin_initialized)
         term_hexrays_plugin();
 }
 
 void idaapi run(int)
 {
-    func_t* func = get_func(get_screen_ea());
-    if (func != nullptr)
-        deep_decompile(func);
+    deep_decompile(get_func(get_screen_ea()));
 }
 
 plugin_t PLUGIN =

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deep_decompile", "deep_decompile\deep_decompile.vcxproj", "{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}"
 EndProject
@@ -11,6 +11,10 @@ Global
 		Debug|x64 = Debug|x64
 		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
+		x32 Release|Win32 = x32 Release|Win32
+		x32 Release|x64 = x32 Release|x64
+		x64 Release|Win32 = x64 Release|Win32
+		x64 Release|x64 = x64 Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -21,6 +25,14 @@ Global
 		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.Release|Win32.Build.0 = Release|Win32
 		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.Release|x64.ActiveCfg = Release|x64
 		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.Release|x64.Build.0 = Release|x64
+		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.x32 Release|Win32.ActiveCfg = x32 Release|Win32
+		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.x32 Release|Win32.Build.0 = x32 Release|Win32
+		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.x32 Release|x64.ActiveCfg = x32 Release|x64
+		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.x32 Release|x64.Build.0 = x32 Release|x64
+		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.x64 Release|Win32.ActiveCfg = x64 Release|Win32
+		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.x64 Release|Win32.Build.0 = x64 Release|Win32
+		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.x64 Release|x64.ActiveCfg = x64 Release|x64
+		{7531E5ED-6B0D-4B9B-9F5C-88E607BC03C5}.x64 Release|x64.Build.0 = x64 Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

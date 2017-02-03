@@ -1,9 +1,16 @@
-IDA Pro Plugin
+# Deep Decompile
 
-Fixes incorrect Hex-Rays output for function calls through batch decompilation.
+## Summary
 
-This plugin acts as an alternative hotkey for decompiling the function the cursor is currently in.  Invoking Hex-Rays through this hotkey will first identify all call instructions in the target function, decompile their respective function bodies, then use this information to more accurately decompile the target function.
+An IDA Pro Plugin.
 
-While testing I found that virtual method calls and exception handlers usually need to be corrected in decompilation.
+This plugin improves Hex-Rays output for a target function by decompiling all functions called by the target function before decompiling the target function.
 
-Currently only supports x86.
+## Building
+
+- Use the **"32 Release"** and **"64 Release"** solution configurations.  Note that 64-bit IDA plugins are compiled to the Win32 platform.
+- A post-build event requires the **"IDA_PATH"** environment variable to be defined to IDA's installation directory.
+
+## Output comparison
+
+See **deep_decompile_output.cpp** and **hexrays_output.cpp**.
