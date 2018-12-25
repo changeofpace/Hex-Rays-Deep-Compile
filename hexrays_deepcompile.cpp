@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <Windows.h>
+//#include <Windows.h>
 
 hexdsp_t* hexdsp = NULL;
 
@@ -16,7 +16,7 @@ bool plugin_initialized = false;
 ////////////////////////////////////////////////////////////////////////////////
 // implementation
 
-void get_called_functions(func_t* target_func, std::unordered_set<func_t*>& called_funcs)
+void get_called_functions(func_t* target_func, std::tr1::unordered_set<func_t*>& called_funcs)
 {
     func_item_iterator_t fii;
     for (bool fi_ok = fii.set(target_func); fi_ok; fi_ok = fii.next_code())
@@ -38,17 +38,17 @@ void deep_decompile(func_t* target_func)
 {
     if (!target_func)
         return;
-    std::unordered_set<func_t*> called_funcs;
+    std::tr1::unordered_set<func_t*> called_funcs;
     get_called_functions(target_func, called_funcs);
     for (auto func : called_funcs)
     {
-        if (!has_cached_cfunc(func->startEA))
+        if (!has_cached_cfunc(func->start_ea))
         {
             hexrays_failure_t hf;
             decompile(func, &hf);
         }
     }
-    open_pseudocode(target_func->startEA, 1);
+    open_pseudocode(target_func->start_ea, 1);
 }
 
 } // namespace
