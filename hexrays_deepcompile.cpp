@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <Windows.h>
+//#include <Windows.h>
 
 hexdsp_t* hexdsp = NULL;
 
@@ -16,7 +16,7 @@ bool plugin_initialized = false;
 ////////////////////////////////////////////////////////////////////////////////
 // implementation
 
-void get_called_functions(func_t* target_func, std::unordered_set<func_t*>& called_funcs)
+void get_called_functions(func_t* target_func, std::tr1::unordered_set<func_t*>& called_funcs)
 {
     func_item_iterator_t fii;
     for (bool fi_ok = fii.set(target_func); fi_ok; fi_ok = fii.next_code())
@@ -34,21 +34,22 @@ void get_called_functions(func_t* target_func, std::unordered_set<func_t*>& call
     }
 }
 
-void deep_decompile(func_t* target_func)
+bool deep_decompile(func_t* target_func)
 {
     if (!target_func)
-        return;
-    std::unordered_set<func_t*> called_funcs;
+        return false;
+    std::tr1::unordered_set<func_t*> called_funcs;
     get_called_functions(target_func, called_funcs);
     for (auto func : called_funcs)
     {
-        if (!has_cached_cfunc(func->startEA))
+        if (!has_cached_cfunc(func->start_ea))
         {
             hexrays_failure_t hf;
             decompile(func, &hf);
         }
     }
-    open_pseudocode(target_func->startEA, 1);
+    open_pseudocode(target_func->start_ea, 1);
+    return true;
 }
 
 } // namespace
@@ -56,7 +57,7 @@ void deep_decompile(func_t* target_func)
 ////////////////////////////////////////////////////////////////////////////////
 // plugin exports
 
-int idaapi init()
+int idaapi init(void)
 {
     if (!init_hexrays_plugin())
         return PLUGIN_SKIP;
@@ -65,15 +66,15 @@ int idaapi init()
     return PLUGIN_OK;
 }
 
-void idaapi term()
+void idaapi term(void)
 {
     if (plugin_initialized)
         term_hexrays_plugin();
 }
 
-void idaapi run(int)
+bool idaapi run(size_t)
 {
-    deep_decompile(get_func(get_screen_ea()));
+    return deep_decompile(get_func(get_screen_ea()));
 }
 
 plugin_t PLUGIN =
